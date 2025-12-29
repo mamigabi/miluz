@@ -1,0 +1,9 @@
+{
+  "name": "oficina-miluz",
+  "version": "1.0.0",
+  "dependencies": {
+    "openai": "^4.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
