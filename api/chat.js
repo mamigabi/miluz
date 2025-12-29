@@ -1,8 +1,6 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
   // Configuración de cabeceras CORS
@@ -23,21 +21,16 @@ export default async function handler(req, res) {
   try {
     const { message } = req.body;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "Eres Miluz, la mentora de trading institucional de Gabriel. Eres experta en Order Flow, Heatmap y metodología Blacksheep. Tu tono es profesional, motivador y directo."
-        },
-        {
-          role: "user",
-          content: message
-        }
-      ],
+    // Usamos gemini-1.5-flash que es el modelo gratuito por excelencia
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: "Eres Miluz, la mentora de trading institucional de Gabriel. Eres experta en Order Flow, Heatmap y metodología Blacksheep. Tu tono es profesional, motivador y directo. Ayudas a Gabriel a gestionar sus cuentas de Orion y Livox Capital.",
     });
 
-    const reply = response.choices[0].message.content;
+    const result = await model.generateContent(message);
+    const response = await result.response;
+    const reply = response.text();
+
     return res.status(200).json({ reply });
   } catch (error) {
     console.error("Error en Miluz:", error);
