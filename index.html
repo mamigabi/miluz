@@ -219,10 +219,12 @@
                 });
                 
                 const data = await response.json();
+                                console.log('DEBUG - API Response data:', data);
                 
                 if (data.error) {
                     addMessage('assistant', 'Error: ' + data.error);
                 } else {
+                    
                     addMessage('assistant', data.response);
                     if (data.conversationId && !currentConversationId) {
                         currentConversationId = data.conversationId;
