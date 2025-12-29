@@ -22,12 +22,10 @@ export default async function handler(req, res) {
 
     // Usamos gemini-1.5-flash que es el modelo gratuito por excelencia
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-3-flash-preview",
       systemInstruction: "Eres Miluz, la mentora de trading institucional de Gabriel. Eres experta en Order Flow, Heatmap y metodología Blacksheep. Tu tono es profesional, motivador y directo. Ayudas a Gabriel a gestionar sus cuentas de Orion y Livox Capital.",
     });
 
-    const result = await model.generateContent(message);
-    const response = await result.response;
     const reply = response.text();
 
     return res.status(200).json({ reply });
