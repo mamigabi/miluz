@@ -227,6 +227,7 @@
                     if (data.conversationId && !currentConversationId) {
                         currentConversationId = data.conversationId;
                         loadConversations();
+                        
                     }
                 }
             } catch (error) {
@@ -243,8 +244,8 @@
             const messagesDiv = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}`;
-            messageDiv.textContent = content;
-            messagesDiv.appendChild(messageDiv);
+            console.log('DEBUG addMessage - role:', role, 'content:', content);
+        messageDiv.innerHTML = content || '(sin respuesta)';            messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
