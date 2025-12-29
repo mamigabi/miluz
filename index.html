@@ -214,11 +214,9 @@
                     body: JSON.stringify({
                         message,
                         conversationId: currentConversationId,
-                        userId: 'user-001'
                     })
                 });
                 
-                const data = await response.json();
                                 console.log('DEBUG - API Response data:', data);
                 
                 if (data.error) {
