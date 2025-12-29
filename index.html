@@ -217,7 +217,8 @@
                     })
                 });
                 
-                                console.log('DEBUG - API Response data:', data);
+const data = await response.json();
+                                                console.log('DEBUG - API Response data:', data);
                 
                 if (data.error) {
                     addMessage('assistant', 'Error: ' + data.error);
