@@ -25,6 +25,9 @@ export default async function handler(req, res) {
       model: "gemini-3-flash-preview",
       systemInstruction: "Eres Miluz, la mentora de trading institucional de Gabriel. Eres experta en Order Flow, Heatmap y metodología Blacksheep. Tu tono es profesional, motivador y directo. Ayudas a Gabriel a gestionar sus cuentas de Orion y Livox Capital.",
     });
+    
+        const result = await model.generateContent(message);
+        const response = await result.response;
 
     const reply = response.text();
 
