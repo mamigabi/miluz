@@ -3,291 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MILUZ - Trading Mentor AI</title>
+    <title>MILUZ - Mentor de Trading</title>
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #fff;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
         }
-        .sidebar {
-            width: 280px;
-            background: #f8f9fa;
-            border-right: 1px solid #e8eaed;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .sidebar-header {
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 3em; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .main-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .chat-section, .risk-calculator, .tradingview-section {
+            background: white;
+            border-radius: 15px;
             padding: 20px;
-            border-bottom: 1px solid #e8eaed;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
-        .sidebar-header h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f1f1f;
-            margin-bottom: 4px;
-        }
-        .sidebar-header p {
-            font-size: 12px;
-            color: #5f6368;
-        }
-        .new-chat-btn {
-            margin: 12px 16px;
-            padding: 12px 16px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.2s;
-        }
-        .new-chat-btn:hover {
-            background: #1557b0;
-        }
-        .conversations {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px;
-        }
-        .conversation-item {
-            padding: 12px 16px;
-            margin-bottom: 4px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #1f1f1f;
-            transition: background 0.2s;
-        }
-        .conversation-item:hover {
-            background: #e8f0fe;
-        }
-        .conversation-item.active {
-            background: #e8f0fe;
-            font-weight: 500;
-        }
-        .main-content {
-            flex: 1;
+        .chat-section {
+            grid-column: 1;
+            grid-row: 1 / 3;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 700px;
         }
-        .chat-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid #e8eaed;
-            background: #fff;
-        }
-        .chat-header h2 {
-            font-size: 16px;
-            font-weight: 500;
-            color: #1f1f1f;
-        }
+        .chat-header h2 { color: #2a5298; margin-bottom: 15px; }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
         }
-        .message {
-            max-width: 75%;
-            padding: 16px;
-            border-radius: 16px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-        .message.user {
-            align-self: flex-end;
-            background: #1a73e8;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        .message.assistant {
-            align-self: flex-start;
-            background: #f1f3f4;
-            color: #1f1f1f;
-            border-bottom-left-radius: 4px;
-        }
-        .input-area {
-            padding: 20px 24px;
-            border-top: 1px solid #e8eaed;
-            background: #fff;
-        }
-        .input-container {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        #messageInput {
+        .message { margin-bottom: 15px; padding: 10px 15px; border-radius: 10px; max-width: 80%; }
+        .user-message { background: #2a5298; color: white; margin-left: auto; text-align: right; }
+        .bot-message { background: #e3f2fd; color: #333; }
+        .chat-input-container { display: flex; gap: 10px; }
+        #chat-input {
             flex: 1;
-            padding: 14px 16px;
-            border: 1px solid #e8eaed;
-            border-radius: 24px;
-            font-size: 14px;
-            outline: none;
-            resize: none;
+            padding: 12px;
+            border: 2px solid #2a5298;
+            border-radius: 8px;
+            font-size: 1em;
         }
-        #messageInput:focus {
-            border-color: #1a73e8;
-        }
-        #sendBtn {
-            padding: 10px 24px;
-            background: #1a73e8;
+        #send-btn {
+            padding: 12px 25px;
+            background: #2a5298;
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            font-weight: bold;
         }
-        #sendBtn:hover {
-            background: #1557b0;
+        #send-btn:hover { background: #1e3c72; }
+        .risk-calculator { grid-column: 2; grid-row: 1; }
+        .risk-calculator h2 { color: #2a5298; margin-bottom: 20px; }
+        .calculator-inputs label { display: block; margin-bottom: 15px; font-weight: 600; color: #555; }
+        .calculator-inputs input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
         }
-        #sendBtn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
+        .calculator-inputs button {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
         }
-        .loading {
-            display: none;
-            padding: 16px;
-            background: #f1f3f4;
-            border-radius: 16px;
-            max-width: 75%;
-            align-self: flex-start;
-            color: #5f6368;
+        .calculator-inputs button:hover { background: #218838; }
+        .risk-result { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; font-weight: 600; }
+        .tradingview-section { grid-column: 2; grid-row: 2; min-height: 400px; }
+        #tradingview_widget { height: 100%; min-height: 350px; }
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+            .chat-section, .risk-calculator, .tradingview-section {
+                grid-column: 1 !important;
+                grid-row: auto !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h1>MILUZ</h1>
-            <p>Trading Mentor AI</p>
-        </div>
-        <button class="new-chat-btn" onclick="newConversation()">+ Nueva conversación</button>
-        <div class="conversations" id="conversationsList"></div>
-    </div>
-    <div class="main-content">
-        <div class="chat-header">
-            <h2>Chat con MILUZ</h2>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="loading" id="loading">MILUZ está escribiendo...</div>
-        <div class="input-area">
-            <div class="input-container">
-                <textarea id="messageInput" rows="1" placeholder="Pregúntale algo a MILUZ..."></textarea>
-                <button id="sendBtn" onclick="sendMessage()">Enviar</button>
+    <div class="container">
+        <header>
+            <h1>💫 MILUZ</h1>
+            <p class="subtitle">Tu mentor de trading institucional</p>
+        </header>
+        <div class="main-content">
+            <div class="chat-section">
+                <div class="chat-header"><h2>Chat con MILUZ</h2></div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" id="chat-input" placeholder="Pregúntale a MILUZ..." />
+                    <button id="send-btn" onclick="sendMessage()">Enviar</button>
+                </div>
             </div>
+            <div class="risk-calculator">
+                <h2>Calculadora de Riesgo</h2>
+                <div class="calculator-inputs">
+                    <label>Capital ($):<input type="number" id="account-balance" value="10000" /></label>
+                    <label>Riesgo (%):<input type="number" id="risk-percent" value="1" step="0.1" /></label>
+                    <label>Entrada:<input type="number" id="entry-price" value="0" step="0.01" /></label>
+                    <label>Stop Loss:<input type="number" id="stop-loss" value="0" step="0.01" /></label>
+                    <button onclick="calculateRisk()">Calcular</button>
+                </div>
+                <div id="risk-result" class="risk-result"></div>
+            </div>
+            <div class="tradingview-section"><div id="tradingview_widget"></div></div>
         </div>
     </div>
     <script>
-        const API_URL = '/api/chat';        let currentConversationId = null;
-        let conversations = [];
-
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (!message) return;
-            
-            input.value = '';
-            input.disabled = true;
-            document.getElementById('sendBtn').disabled = true;
-            
-            addMessage('user', message);
-            document.getElementById('loading').style.display = 'block';
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message,
-                        conversationId: currentConversationId,
-                    })
-                });
-                
-const data = await response.json();
-                                                console.log('DEBUG - API Response data:', data);
-                
-                if (data.error) {
-                    addMessage('assistant', 'Error: ' + data.error);
-                } else {
-                    
-                    addMessage('assistant', data.response);
-                    if (data.conversationId && !currentConversationId) {
-                        currentConversationId = data.conversationId;
-                        loadConversations();
-                        
-                    }
-                }
-            } catch (error) {
-                addMessage('assistant', 'Error: ' + error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                input.disabled = false;
-                document.getElementById('sendBtn').disabled = false;
-                input.focus();
-            }
-        }
-        
-        function addMessage(role, content) {
-            const messagesDiv = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-            console.log('DEBUG addMessage - role:', role, 'content:', content);
-        messageDiv.innerHTML = content || '(sin respuesta)';            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        function newConversation() {
-            currentConversationId = null;
-            document.getElementById('chatMessages').innerHTML = '';
-            document.getElementById('messageInput').focus();
-            document.querySelectorAll('.conversation-item').forEach(item => {
-                item.classList.remove('active');
-            });
-        }
-        
-        function loadConversations() {
-            const list = document.getElementById('conversationsList');
-            if (!conversations.find(c => c.id === currentConversationId)) {
-                conversations.unshift({
-                    id: currentConversationId,
-                    title: 'Nueva conversación'
-                });
-            }
-            list.innerHTML = conversations.map(conv => 
-                `<div class="conversation-item ${conv.id === currentConversationId ? 'active' : ''}" 
-                      onclick="loadConversation('${conv.id}')">
-                    ${conv.title}
-                </div>`
-            ).join('');
-        }
-        
-        function loadConversation(convId) {
-            alert('Cargar conversación: ' + convId + ' (próximamente)');
-        }
-        
-        document.getElementById('messageInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-        
-        window.onload = () => {
-            document.getElementById('messageInput').focus();
-        };
+        const SUPABASE_URL='https://tziirdhvhxhrmuuxrgvb.supabase.co';
+        const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aWlyZGh2aHhocm11dXhyZ3ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4ODU2ODcsImV4cCI6MjA1MjQ2MTY4N30.WGXRr-qGCIWJ2EEm1Pd6K6HwCgMv0TZHCB8VC3gW0A4';
+        window.addEventListener('load',function(){new TradingView.widget({autosize:true,symbol:'BINANCE:BTCUSDT',interval:'D',timezone:'Etc/UTC',theme:'light',style:'1',locale:'es',toolbar_bg:'#f1f3f6',enable_publishing:false,allow_symbol_change:true,container_id:'tradingview_widget'})});
+        async function sendMessage(){const input=document.getElementById('chat-input');const message=input.value.trim();if(!message)return;addMessageToChat(message,'user');input.value='';addMessageToChat('Pensando...','bot',true);try{const response=await fetch(`${SUPABASE_URL}/functions/v1/chat-miluz`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON_KEY}`},body:JSON.stringify({message})});const data=await response.json();const messages=document.getElementById('chat-messages');messages.removeChild(messages.lastChild);addMessageToChat(data.response||'Lo siento, hubo un error. Inténtalo de nuevo.','bot')}catch(error){console.error('Error:',error);const messages=document.getElementById('chat-messages');messages.removeChild(messages.lastChild);addMessageToChat('Error de conexión. Verifica que el Edge Function esté activo.','bot')}}
+        function addMessageToChat(text,sender,isLoading=false){const messagesDiv=document.getElementById('chat-messages');const messageDiv=document.createElement('div');messageDiv.className=`message ${sender}-message`;messageDiv.textContent=text;if(isLoading)messageDiv.style.opacity='0.6';messagesDiv.appendChild(messageDiv);messagesDiv.scrollTop=messagesDiv.scrollHeight}
+        document.addEventListener('DOMContentLoaded',function(){const input=document.getElementById('chat-input');input.addEventListener('keypress',function(e){if(e.key==='Enter')sendMessage()});addMessageToChat('¡Hola! Soy MILUZ, tu mentor de trading. ¿En qué puedo ayudarte hoy?','bot')});
+        function calculateRisk(){const accountBalance=parseFloat(document.getElementById('account-balance').value);const riskPercent=parseFloat(document.getElementById('risk-percent').value);const entryPrice=parseFloat(document.getElementById('entry-price').value);const stopLoss=parseFloat(document.getElementById('stop-loss').value);if(!accountBalance||!riskPercent||!entryPrice||!stopLoss){alert('Por favor completa todos los campos');return}const riskAmount=(accountBalance*riskPercent)/100;const priceDistance=Math.abs(entryPrice-stopLoss);const positionSize=riskAmount/priceDistance;const positionValue=positionSize*entryPrice;const resultDiv=document.getElementById('risk-result');resultDiv.innerHTML=`<h3>Resultados:</h3><p><strong>Dinero en Riesgo:</strong> $${riskAmount.toFixed(2)}</p><p><strong>Tamaño de Posición:</strong> ${positionSize.toFixed(4)} unidades</p><p><strong>Valor de Posición:</strong> $${positionValue.toFixed(2)}</p><p><strong>Distancia al Stop Loss:</strong> $${priceDistance.toFixed(4)}</p>`}
     </script>
 </body>
 </html>
