@@ -116,6 +116,11 @@
         <div class="main-content">
             <div class="chat-section">
                 <div class="chat-header"><h2>Chat con MILUZ</h2></div>
+                                    <div class="chat-controls" style="display: flex; gap: 10px; margin: 15px 0; justify-content: center; align-items: center;">
+                        <button onclick="window.open('https://www.tradingview.com/accounts/signup/', '_blank')" style="background: linear-gradient(135deg, #2962ff, #0033cc); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📊 Registrarse en TradingView</button>
+                        <button id="voice-call-btn" onclick="startVoiceCall()" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎤 Llamada de Voz</button>
+                        <button id="video-call-btn" onclick="startVideoCall()" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📹 Videollamada</button>
+                    </div>
                 <div id="chat-messages" class="chat-messages"></div>
                 <div class="chat-input-container">
                     <input type="text" id="chat-input" placeholder="Pregúntale a MILUZ..." />
@@ -184,6 +189,116 @@
         document.getElementById('voice-btn').classList.add('recording');
       }
     }ocument.getElementById('risk-percent').value);const entryPrice=parseFloat(document.getElementById('entry-price').value);const stopLoss=parseFloat(document.getElementById('stop-loss').value);if(!accountBalance||!riskPercent||!entryPrice||!stopLoss){alert('Por favor completa todos los campos');return}const riskAmount=(accountBalance*riskPercent)/100;const priceDistance=Math.abs(entryPrice-stopLoss);const positionSize=riskAmount/priceDistance;const positionValue=positionSize*entryPrice;const resultDiv=document.getElementById('risk-result');resultDiv.innerHTML=`<h3>Resultados:</h3><p><strong>Dinero en Riesgo:</strong> $${riskAmount.toFixed(2)}</p><p><strong>Tamaño de Posición:</strong> ${positionSize.toFixed(4)} unidades</p><p><strong>Valor de Posición:</strong> $${positionValue.toFixed(2)}</p><p><strong>Distancia al Stop Loss:</strong> $${priceDistance.toFixed(4)}</p>`}
-    </script>
+    
+    
+            // Funciones para llamadas de voz y video
+        let localStream = null;
+        let peerConnection = null;
+        let isVoiceCall = false;
+        let isVideoCall = false;
+
+        async function startVoiceCall() {
+            if (isVoiceCall) {
+                stopCall();
+                return;
+            }
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                isVoiceCall = true;
+                document.getElementById('voice-call-btn').innerHTML = '⏸️ Finalizar Llamada';
+                document.getElementById('voice-call-btn').style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a6f)';
+                alert('Llamada de voz iniciada con MILUZ. ¡Habla ahora!');
+                
+                // Aquí integrarías la API de voz de Gemini
+                setupVoiceRecognition();
+            } catch (error) {
+                alert('Error al acceder al micrófono: ' + error.message);
+            }
+        }
+
+        async function startVideoCall() {
+            if (isVideoCall) {
+                stopCall();
+                return;
+            }
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+                isVideoCall = true;
+                document.getElementById('video-call-btn').innerHTML = '⏹️ Finalizar Video';
+                document.getElementById('video-call-btn').style.background = 'linear-gradient(135deg, #333, #555)';
+                
+                // Crear elemento de video
+                const videoContainer = document.createElement('div');
+                videoContainer.id = 'video-container';
+                videoContainer.style.cssText = 'position: fixed; top: 10px; right: 10px; width: 300px; height: 225px; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10000;';
+                
+                const video = document.createElement('video');
+                video.id = 'local-video';
+                video.srcObject = localStream;
+                video.autoplay = true;
+                video.muted = true;
+                video.style.width = '100%';
+                video.style.height = '100%';
+                video.style.objectFit = 'cover';
+                
+                videoContainer.appendChild(video);
+                document.body.appendChild(videoContainer);
+                
+                alert('Videollamada iniciada con MILUZ. ¡Ahora puedes verme!');
+                setupVoiceRecognition();
+            } catch (error) {
+                alert('Error al acceder a la cámara/micrófono: ' + error.message);
+            }
+        }
+
+        function setupVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Tu navegador no soporta reconocimiento de voz');
+                return;
+            }
+            
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'es-ES';
+            
+            recognition.onresult = function(event) {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+                
+                if (event.results[0].isFinal) {
+                    document.getElementById('chat-input').value = transcript;
+                    sendMessage();
+                }
+            };
+            
+            recognition.start();
+        }
+
+        function stopCall() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            if (isVoiceCall) {
+                document.getElementById('voice-call-btn').innerHTML = '🎤 Llamada de Voz';
+                document.getElementById('voice-call-btn').style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                isVoiceCall = false;
+            }
+            
+            if (isVideoCall) {
+                document.getElementById('video-call-btn').innerHTML = '📹 Videollamada';
+                document.getElementById('video-call-btn').style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a6f)';
+                const videoContainer = document.getElementById('video-container');
+                if (videoContainer) {
+                    videoContainer.remove();
+                }
+                isVideoCall = false;
+            }
+        }</script>
 </body>
 </html>
