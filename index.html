@@ -61,6 +61,24 @@
             cursor: pointer;
             font-weight: bold;
         }
+      #voice-btn {
+        padding: 12px;
+        background: #1E53E5;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+        margin-left: 10px;
+      }
+      #voice-btn.recording {
+        background: #E53E3E;
+        animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+      }
         #send-btn:hover { background: #1e3c72; }
         .risk-calculator { grid-column: 2; grid-row: 1; }
         .risk-calculator h2 { color: #2a5298; margin-bottom: 20px; }
@@ -125,6 +143,7 @@
                 <div class="chat-input-container">
                     <input type="text" id="chat-input" placeholder="Pregúntale a MILUZ..." />
                     <button id="send-btn" onclick="sendMessage()">Enviar</button>
+            <button id="voice-btn" onclick="toggleVoice()" title="Hablar con MILUZ">🎤</button>
                 </div>
             </div>
             <div class="risk-calculator">
@@ -151,7 +170,47 @@
         async function sendMessage(){const input=document.getElementById('chat-input');const message=input.value.trim();if(!message)return;addMessageToChat(message,'user');input.value='';addMessageToChat('Pensando...','bot',true);try{const response=await fetch(`${SUPABASE_URL}/functions/v1/chat-miluz`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON_KEY}`},body:JSON.stringify({message})});const data=await response.json();const messages=document.getElementById('chat-messages');messages.removeChild(messages.lastChild);addMessageToChat(data.response||'Lo siento, hubo un error. Inténtalo de nuevo.','bot')}catch(error){console.error('Error:',error);const messages=document.getElementById('chat-messages');messages.removeChild(messages.lastChild);addMessageToChat('Error de conexión. Verifica que el Edge Function esté activo.','bot')}}
         function addMessageToChat(text,sender,isLoading=false){const messagesDiv=document.getElementById('chat-messages');const messageDiv=document.createElement('div');messageDiv.className=`message ${sender}-message`;messageDiv.textContent=text;if(isLoading)messageDiv.style.opacity='0.6';messagesDiv.appendChild(messageDiv);messagesDiv.scrollTop=messagesDiv.scrollHeight}
         document.addEventListener('DOMContentLoaded',function(){const input=document.getElementById('chat-input');input.addEventListener('keypress',function(e){if(e.key==='Enter')sendMessage()});addMessageToChat('¡Hola! Soy MILUZ, tu mentor de trading. ¿En qué puedo ayudarte hoy?','bot')});
-        function calculateRisk(){const accountBalance=parseFloat(document.getElementById('account-balance').value);const riskPercent=parseFloat(document.getElementById('risk-percent').value);const entryPrice=parseFloat(document.getElementById('entry-price').value);const stopLoss=parseFloat(document.getElementById('stop-loss').value);if(!accountBalance||!riskPercent||!entryPrice||!stopLoss){alert('Por favor completa todos los campos');return}const riskAmount=(accountBalance*riskPercent)/100;const priceDistance=Math.abs(entryPrice-stopLoss);const positionSize=riskAmount/priceDistance;const positionValue=positionSize*entryPrice;const resultDiv=document.getElementById('risk-result');resultDiv.innerHTML=`<h3>Resultados:</h3><p><strong>Dinero en Riesgo:</strong> $${riskAmount.toFixed(2)}</p><p><strong>Tamaño de Posición:</strong> ${positionSize.toFixed(4)} unidades</p><p><strong>Valor de Posición:</strong> $${positionValue.toFixed(2)}</p><p><strong>Distancia al Stop Loss:</strong> $${priceDistance.toFixed(4)}</p>`}
+        function calculateRisk(){const accountBalance=parseFloat(document.getElementById('account-balance').value);const riskPercent=parseFloat(d
+
+    // Voice Recognition
+    let recognition = null;
+    let isRecording = false;
+    
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'es-ES';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('chat-input').value = transcript;
+        sendMessage();
+      };
+      
+      recognition.onend = function() {
+        isRecording = false;
+        document.getElementById('voice-btn').classList.remove('recording');
+      };
+    }
+    
+    function toggleVoice() {
+      if (!recognition) {
+        alert('Tu navegador no soporta reconocimiento de voz');
+        return;
+      }
+      
+      if (isRecording) {
+        recognition.stop();
+        isRecording = false;
+        document.getElementById('voice-btn').classList.remove('recording');
+      } else {
+        recognition.start();
+        isRecording = true;
+        document.getElementById('voice-btn').classList.add('recording');
+      }
+    }ocument.getElementById('risk-percent').value);const entryPrice=parseFloat(document.getElementById('entry-price').value);const stopLoss=parseFloat(document.getElementById('stop-loss').value);if(!accountBalance||!riskPercent||!entryPrice||!stopLoss){alert('Por favor completa todos los campos');return}const riskAmount=(accountBalance*riskPercent)/100;const priceDistance=Math.abs(entryPrice-stopLoss);const positionSize=riskAmount/priceDistance;const positionValue=positionSize*entryPrice;const resultDiv=document.getElementById('risk-result');resultDiv.innerHTML=`<h3>Resultados:</h3><p><strong>Dinero en Riesgo:</strong> $${riskAmount.toFixed(2)}</p><p><strong>Tamaño de Posición:</strong> ${positionSize.toFixed(4)} unidades</p><p><strong>Valor de Posición:</strong> $${positionValue.toFixed(2)}</p><p><strong>Distancia al Stop Loss:</strong> $${priceDistance.toFixed(4)}</p>`}
     </script>
 </body>
 </html>
