@@ -117,8 +117,6 @@
             <div class="chat-section">
                 <div class="chat-header"><h2>Chat con MILUZ</h2></div>
                                     <div class="chat-controls" style="display: flex; gap: 10px; margin: 15px 0; justify-content: center; align-items: center;">
-                        <button onclick="window.open('https://www.tradingview.com/accounts/signup/', '_blank')" style="background: linear-gradient(135deg, #2962ff, #0033cc); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📊 Registrarse en TradingView</button>
-                        <button id="voice-call-btn" onclick="startVoiceCall()" style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">🎤 Llamada de Voz</button>
                         <button id="video-call-btn" onclick="startVideoCall()" style="background: linear-gradient(135deg, #ff6b6b, #ee5a6f); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📹 Videollamada</button>
                     </div>
                 <div id="chat-messages" class="chat-messages"></div>
@@ -135,12 +133,35 @@
           <div style="font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #333; text-align: center; margin-top: 5px;">Calendario Económico en tiempo real proporcionado por <a href="https://es.investing.com/" rel="nofollow" target="_blank" style="font-size: 11px; color: #06529D; font-weight: bold;">Investing.com España</a>.</div>
           <!-- Investing.com Economic Calendar END -->
         </div>
-            <div class="tradingview-section"><div id="tradingview_widget"></di>v
-        <a href="https://www.tradingview.com/" target="_blank" class="tv-register-btn">
-          📊 Abrir cuenta en TradingView
-        </a>></div>
-        </div>
-    </div>
+        <div class="tradingview-section">
+            <h2>✅ Check-In Diario del Plan de Trading</h2>
+            <p style="margin-bottom: 15px; color: #666;">Marca todos los checks antes de operar:</p>
+            <div id="trading-checklist" style="display: flex; flex-direction: column; gap: 12px;">
+                <label style="display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <input type="checkbox" class="checklist-item" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <span>📊 He revisado el calendario económico</span>
+                </label>
+                <label style="display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <input type="checkbox" class="checklist-item" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <span>📈 He analizado la tendencia del mercado</span>
+                </label>
+                <label style="display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <input type="checkbox" class="checklist-item" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <span>💰 He definido mi stop loss y take profit</span>
+                </label>
+                <label style="display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <input type="checkbox" class="checklist-item" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <span>🎯 He calculado el tamaño de posición correcto</span>
+                </label>
+                <label style="display: flex; align-items: center; padding: 12px; background: #f9f9f9; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                    <input type="checkbox" class="checklist-item" style="width: 20px; height: 20px; margin-right: 12px; cursor: pointer;">
+                    <span>🧠 Tengo control emocional y estoy en buen estado mental</span>
+                </label>
+            </div>
+            <div id="trading-status" style="margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1.1em; display: none;">
+            </div>
+            <a href="https://www.tradingview.com/" target="_blank" class="tv-register-btn" style="margin-top: 15px;">📊 Abrir TradingView</a>
+        </div>    </div>
     <script>
         const SUPABASE_URL='https://tziirdhvhxhrmuuxrgvb.supabase.co';
         const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6aWlyZGh2aHhocm11dXhyZ3ZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY4ODU2ODcsImV4cCI6MjA1MjQ2MTY4N30.WGXRr-qGCIWJ2EEm1Pd6K6HwCgMv0TZHCB8VC3gW0A4';
@@ -299,6 +320,40 @@
                 }
                 isVideoCall = false;
             }
+
+            // Trading Checklist Logic
+function checkTradingStatus() {
+    const checkboxes = document.querySelectorAll('.checklist-item');
+    const totalChecks = checkboxes.length;
+    let checkedCount = 0;
+    
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) checkedCount++;
+        checkbox.parentElement.style.background = checkbox.checked ? '#d4edda' : '#f9f9f9';
+    });
+    
+    const statusDiv = document.getElementById('trading-status');
+    if (totalChecks > 0) {
+        statusDiv.style.display = 'block';
+        if (checkedCount === totalChecks) {
+            statusDiv.innerHTML = '✅ ¡PUEDES OPERAR! Todos los checks completados';
+            statusDiv.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+            statusDiv.style.color = 'white';
+        } else {
+            statusDiv.innerHTML = '❌ NO OPERAR - Completa todos los checks (' + checkedCount + '/' + totalChecks + ')';
+            statusDiv.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a6f)';
+            statusDiv.style.color = 'white';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.checklist-item');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', checkTradingStatus);
+    });
+    checkTradingStatus();
+});
         }</script>
 </body>
 </html>
