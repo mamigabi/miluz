@@ -80,31 +80,8 @@
         50% { opacity: 0.6; }
       }
         #send-btn:hover { background: #1e3c72; }
-        .risk-calculator { grid-column: 2; grid-row: 1; }
-        .risk-calculator h2 { color: #2a5298; margin-bottom: 20px; }
-        .calculator-inputs label { display: block; margin-bottom: 15px; font-weight: 600; color: #555; }
-        .calculator-inputs input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 1em;
-        }
-        .calculator-inputs button {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .calculator-inputs button:hover { background: #218838; }
-        .risk-result { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; font-weight: 600; }
+        investing-section grid-column: 2; grid-row: 1; }
+        
         .tradingview-section { grid-column: 2; grid-row: 2; min-height: 400px; }
         #tradingview_widget { height: 100%; min-height: 350px; }
         @media (max-width: 1024px) {
@@ -146,17 +123,69 @@
             <button id="voice-btn" onclick="toggleVoice()" title="Hablar con MILUZ">🎤</button>
                 </div>
             </div>
-            <div class="risk-calculator">
-                <h2>Calculadora de Riesgo</h2>
-                <div class="calculator-inputs">
-                    <label>Capital ($):<input type="number" id="account-balance" value="10000" /></label>
-                    <label>Riesgo (%):<input type="number" id="risk-percent" value="1" step="0.1" /></label>
-                    <label>Entrada:<input type="number" id="entry-price" value="0" step="0.01" /></label>
-                    <label>Stop Loss:<input type="number" id="stop-loss" value="0" step="0.01" /></label>
-                    <button onclick="calculateRisk()">Calcular</button>
-                </div>
-                <div id="risk-result" class="risk-result"></div>
-            </div>
+            <div class="investing-section">
+          <h2>📈 Mercados en Vivo</h2>
+          <!-- TradingView Widget BEGIN -->
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+            {
+              "colorTheme": "light",
+              "dateRange": "12M",
+              "showChart": true,
+              "locale": "es",
+              "width": "100%",
+              "height": "600",
+              "largeChartUrl": "",
+              "isTransparent": false,
+              "showSymbolLogo": true,
+              "showFloatingTooltip": false,
+              "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+              "plotLineColorFalling": "rgba(41, 98, 255, 1)",
+              "gridLineColor": "rgba(240, 243, 250, 0)",
+              "scaleFontColor": "rgba(106, 109, 120, 1)",
+              "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+              "belowLineFillColorFalling": "rgba(41, 98, 255, 0.12)",
+              "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+              "belowLineFillColorFallingBottom": "rgba(41, 98, 255, 0)",
+              "symbolActiveColor": "rgba(41, 98, 255, 0.12)",
+              "tabs": [
+                {
+                  "title": "Índices",
+                  "symbols": [
+                    {"s": "FOREXCOM:SPXUSD", "d": "S&P 500"},
+                    {"s": "FOREXCOM:NSXUSD", "d": "US 100"},
+                    {"s": "FOREXCOM:DJI", "d": "Dow 30"},
+                    {"s": "INDEX:NKY", "d": "Nikkei 225"},
+                    {"s": "INDEX:DEU40", "d": "DAX Index"}
+                  ]
+                },
+                {
+                  "title": "Forex",
+                  "symbols": [
+                    {"s": "FX:EURUSD", "d": "EUR/USD"},
+                    {"s": "FX:GBPUSD", "d": "GBP/USD"},
+                    {"s": "FX:USDJPY", "d": "USD/JPY"},
+                    {"s": "FX:USDCHF", "d": "USD/CHF"},
+                    {"s": "FX:AUDUSD", "d": "AUD/USD"}
+                  ]
+                },
+                {
+                  "title": "Cripto",
+                  "symbols": [
+                    {"s": "BINANCE:BTCUSDT", "d": "Bitcoin"},
+                    {"s": "BINANCE:ETHUSDT", "d": "Ethereum"},
+                    {"s": "BINANCE:BNBUSDT", "d": "BNB"},
+                    {"s": "BINANCE:SOLUSDT", "d": "Solana"},
+                    {"s": "BINANCE:XRPUSDT", "d": "Ripple"}
+                  ]
+                }
+              ]
+            }
+            </script>
+          </div>
+          <!-- TradingView Widget END -->
+        </div>
             <div class="tradingview-section"><div id="tradingview_widget"></di>v
         <a href="https://www.tradingview.com/" target="_blank" class="tv-register-btn">
           📊 Abrir cuenta en TradingView
