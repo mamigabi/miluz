@@ -128,6 +128,7 @@
                 <div id="chat-messages" class="chat-messages"></div>
                 <div class="chat-input-container">
                     <input type="text" id="chat-input" placeholder="Pregúntale a MILUZ..." />
+                                    <button id="screen-share-btn" onclick="startScreenShare()" style="background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">📺 Compartir Pantalla</button>
                     <button id="send-btn" onclick="sendMessage()">Enviar</button>
             <button id="voice-btn" onclick="toggleVoice()" title="Hablar con MILUZ">🎤</button>
                 </div>
@@ -331,6 +332,75 @@
 function checkTradingStatus() {
     const checkboxes = document.querySelectorAll('.checklist-item');
     const totalChecks = checkboxes.length;
+
+                        // Función para compartir pantalla
+    let screenStream = null;
+    let isScreenSharing = false;
+    
+    async function startScreenShare() {
+        if (isScreenSharing) {
+            stopScreenShare();
+            return;
+        }
+        
+        try {
+            // Solicitar permiso para compartir pantalla
+            screenStream = await navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    cursor: "always"
+                },
+                audio: false
+            });
+            
+            isScreenSharing = true;
+            document.getElementById('screen-share-btn').innerHTML = '⏹️ Detener Compartir';
+            document.getElementById('screen-share-btn').style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a6f)';
+            
+            // Crear contenedor para mostrar la pantalla compartida
+            const screenContainer = document.createElement('div');
+            screenContainer.id = 'screen-container';
+            screenContainer.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 1200px; height: 80vh; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 10000; background: #000;';
+            
+            const video = document.createElement('video');
+            video.id = 'screen-video';
+            video.srcObject = screenStream;
+            video.autoplay = true;
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.style.objectFit = 'contain';
+            
+            screenContainer.appendChild(video);
+            document.body.appendChild(screenContainer);
+            
+            // Detectar cuando el usuario detiene desde el navegador
+            screenStream.getVideoTracks()[0].onended = () => {
+                stopScreenShare();
+            };
+            
+        } catch (error) {
+            if (error.name === 'NotAllowedError') {
+                alert('Permiso denegado. Debes permitir compartir pantalla.');
+            } else {
+                alert('Error al compartir pantalla: ' + error.message);
+            }
+        }
+    }
+    
+    function stopScreenShare() {
+        if (screenStream) {
+            screenStream.getTracks().forEach(track => track.stop());
+            screenStream = null;
+        }
+        
+        const screenContainer = document.getElementById('screen-container');
+        if (screenContainer) {
+            screenContainer.remove();
+        }
+        
+        document.getElementById('screen-share-btn').innerHTML = '📺 Compartir Pantalla';
+        document.getElementById('screen-share-btn').style.background = 'linear-gradient(135deg, #6a11cb, #2575fc)';
+        isScreenSharing = false;
+    }
     let checkedCount = 0;
     
     checkboxes.forEach(checkbox => {
