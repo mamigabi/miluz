@@ -159,12 +159,11 @@ export default async function handler(req, res) {
 
     // Llamar a Gemini 2.0 Flash
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-1.5-flash",
       systemInstruction: SYSTEM_INSTRUCTION
     });
 
-    const result = await model.generateContent(fullPrompt);
-    const response = result.response;
+    model: "gemini-1.5-flash",    const response = result.response;
     const text = response.text();
 
     res.status(200).json({ response: text });
