@@ -19,6 +19,40 @@ async function sendMessage() {
   addMessageToChat(message, 'user');
   input.value = '';
   addMessageToChat('Pensando...', 'bot', true);
+
+      // Validar riesgo antes de enviar al chat
+      try {
+                const riskCheck = await fetch('/api/risk', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ message })
+                                        });
+                const riskData = await riskCheck.json();
+
+                const riskAlertDiv = document.getElementById('risk-alert');
+                const riskMessageSpan = document.getElementById('risk-message');
+
+                if (riskData.violations && riskData.violations.length > 0) {
+                              const violationMessages = riskData.violations.map(v => v.message).join('<br>');
+                              riskMessageSpan.innerHTML = violationMessages;
+                              const hasCritical = riskData.violations.some(v => v.severity === 'critical');
+                              riskAlertDiv.className = hasCritical ? 'risk-alert danger' : 'risk-alert warning';
+                              riskAlertDiv.style.display = 'block';
+
+                              if (hasCritical) {
+                                                // Remover mensaje "Pensando..."
+                                                const loadingMsg = messagesDiv.querySelector('.loading');
+                                                if (loadingMsg) loadingMsg.remove();
+                                                addMessageToChat('⛔ Operación bloqueada por riesgo crítico.', 'bot');
+                                                return;
+                                            }
+                          } else {
+                              riskAlertDiv.style.display = 'none';
+                          }
+            } catch (error) {
+                console.error('Error en validación de riesgo:', error);
+                // Si falla la validación de riesgo, continuar con el chat (fail-safe)
+            }
   
   try {
     const response = await fetch('/api/chat', {
