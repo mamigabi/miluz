@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         }
 
         // Generar análisis post-mortem con Gemini
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-previewgemini-3-flash-previewgemini-3-flash-preview' });
         
         const prompt = `
 Analiza esta operación de trading y genera un post-mortem detallado:
