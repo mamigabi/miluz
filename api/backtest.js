@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         }
 
         // Usar Gemini para analizar estrategia y simular trades
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-previewgemini-3-flash-previewgemini-3-flash-previewgemini-3-flash-preview' });
 
         const prompt = `
 Eres un motor de backtesting para estrategias de trading.
