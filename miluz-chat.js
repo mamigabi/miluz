@@ -254,3 +254,35 @@ document.addEventListener('DOMContentLoaded', function() {
   
   console.log('✅ MILUZ Chat cargado correctamente con todas las funcionalidades multimodales');
 });
+
+// ===== GEMINI VISION - ANÁLISIS DE GRÁFICOS =====
+async function analyzeChart(input) {
+      const file = input.files[0];
+    if (!file || !file.type.startsWith('image/')) {
+        addMessageToChat('⚠️ Selecciona una imagen válida', 'bot');
+        return;
+    }
+    addMessageToChat('📊 Analizando gráfico...', 'bot', true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const response = await fetch('/api/vision', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: e.target.result })
+            });
+            const data = await response.json();
+            const loadingMsg = document.querySelector('.chat-messages .loading');
+            if (loadingMsg) loadingMsg.remove();
+            if (data.success) addMessageToChat(data.analysis, 'bot');
+            else addMessageToChat('⚠️ Error: ' + (data.error || 'Desconocido'), 'bot');
+        } catch (error) {
+            console.error('Error vision:', error);
+            const loadingMsg = document.querySelector('.chat-messages .loading');
+            if (loadingMsg) loadingMsg.remove();
+            addMessageToChat('⚠️ Error al analizar gráfico', 'bot');
+        }
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+}
